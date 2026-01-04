@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import praktikum.Bun;
 import praktikum.Burger;
 import praktikum.Database;
@@ -11,12 +13,12 @@ import praktikum.Ingredient;
 import java.util.Arrays;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class BurgerTests {
 
     private Burger burger;
-    private static Database database;
 
     // Исходные данные для теста (различные варианты булочек и начинок)
     private Bun initialBun;
@@ -28,6 +30,64 @@ public class BurgerTests {
     private String expectedFirstIngredientName;
     private String expectedSecondIngredientName;
 
+    // Мок базы данных
+    @Mock
+    private Database database;
+
+    // Аннотация для автоматической инициализации моков
+    @Before
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+
+        // Создаём пустой бургер
+        burger = new Burger();
+
+        // Подготовка мока базы данных
+        prepareDatabaseMock();
+
+        // Добавляем ингредиенты
+        burger.setBuns(initialBun);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
+    }
+
+    // Подготовка мока базы данных
+    private void prepareDatabaseMock() {
+        // Создаем заготовки булочек и ингредиентов
+        Bun[] buns = new Bun[]{
+                new Bun("black bun", 100),
+                new Bun("white bun", 200),
+                new Bun("red bun", 300)
+        };
+
+        Ingredient[] ingredients = new Ingredient[]{
+                new Ingredient(praktikum.IngredientType.SAUCE, "hot sauce", 100),
+                new Ingredient(praktikum.IngredientType.SAUCE, "sour cream", 200),
+                new Ingredient(praktikum.IngredientType.SAUCE, "chili sauce", 300),
+                new Ingredient(praktikum.IngredientType.FILLING, "cutlet", 100),
+                new Ingredient(praktikum.IngredientType.FILLING, "dinosaur", 200),
+                new Ingredient(praktikum.IngredientType.FILLING, "sausage", 300)
+        };
+
+        // Конфигурируем мок, чтобы он возвращал созданные булочки и ингредиенты
+        when(database.availableBuns()).thenReturn(Arrays.asList(buns));
+        when(database.availableIngredients()).thenReturn(Arrays.asList(ingredients));
+    }
+
+    // Список наборов данных для тестирования
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                // Белая булочка + острый соус + котлета
+                {new Bun("white bun", 200), new Ingredient(praktikum.IngredientType.SAUCE, "hot sauce", 100), new Ingredient(praktikum.IngredientType.FILLING, "cutlet", 100),
+                        "white bun", "hot sauce", "cutlet"},
+
+                // Красная булочка + чили + динозаврик
+                {new Bun("red bun", 300), new Ingredient(praktikum.IngredientType.SAUCE, "chili sauce", 300), new Ingredient(praktikum.IngredientType.FILLING, "dinosaur", 200),
+                        "red bun", "chili sauce", "dinosaur"}
+        });
+    }
+
     // Конструктор для передачи данных из параметризированного теста
     public BurgerTests(Bun initialBun, Ingredient firstIngredient, Ingredient secondIngredient,
                        String expectedBunName, String expectedFirstIngredientName, String expectedSecondIngredientName) {
@@ -37,34 +97,6 @@ public class BurgerTests {
         this.expectedBunName = expectedBunName;
         this.expectedFirstIngredientName = expectedFirstIngredientName;
         this.expectedSecondIngredientName = expectedSecondIngredientName;
-    }
-
-    // Подготовительные действия перед каждым тестом
-    @Before
-    public void setup() {
-        // Создаём пустой бургер
-        burger = new Burger();
-
-        // Добавляем ингредиенты
-        burger.setBuns(initialBun);
-        burger.addIngredient(firstIngredient);
-        burger.addIngredient(secondIngredient);
-    }
-
-    // Список наборов данных для тестирования
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        database = new Database();
-
-        return Arrays.asList(new Object[][]{
-                // Белая булочка + острый соус + котлета
-                {database.availableBuns().get(1), database.availableIngredients().get(0), database.availableIngredients().get(3),
-                        "white bun", "hot sauce", "cutlet"},
-
-                // Красная булочка + чили + динозаврик
-                {database.availableBuns().get(2), database.availableIngredients().get(2), database.availableIngredients().get(4),
-                        "red bun", "chili sauce", "dinosaur"}
-        });
     }
 
     // Тест 1: Проверка суммы стоимости бургера
@@ -88,13 +120,13 @@ public class BurgerTests {
         float calculatedPrice = burger.getPrice();
         long roundedPrice = Math.round(calculatedPrice);
 
-        // Замена оригинальной цены на округленную
+        // Замена оригинальной цены на округлённую
         actualReceipt = actualReceipt.replaceAll("(?<=Price:\\s)\\d+(,\\d+)?", Long.toString(roundedPrice));
 
         // Очистка фактического чека от скрытых символов
         actualReceipt = actualReceipt.replaceAll("\r", "").trim();
 
-        // Формируем ожидаемый чек динамически
+        // Формируем ожидаемый чек
         String expectedReceipt =
                 "(==== " + expectedBunName + " ====)\n" +
                         "= " + firstIngredient.getType().toString().toLowerCase() + " " + expectedFirstIngredientName + " =\n" +

@@ -28,13 +28,13 @@ public class BunTests {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {new Bun("Black Bun", 100f), "Black Bun", 100f},         // Черная булочка
-                {new Bun("White Bun", 200f), "White Bun", 200f},         // Белая булочка
-                {new Bun("Red Bun", 300f), "Red Bun", 300f},             // Красная булочка
+                {new Bun("Black Bun", 100f), "Black Bun", 100f},
+                {new Bun("White Bun", 200f), "White Bun", 200f},
+                {new Bun("Red Bun", 300f), "Red Bun", 300f},
         });
     }
 
-    // Основной тест, проверяющий правильность создания булочки
+    // Основной тест, проверяющий правильность булочки
 
     @Test
     public void shouldCreateBunCorrectly() {
