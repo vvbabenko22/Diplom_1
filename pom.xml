@@ -40,7 +40,7 @@
 
     <build>
         <plugins>
-            <!-- Compiler plugin (по умолчанию рекомендуется для Java 11+) -->
+            <!-- Compiler plugin (для Java 11+) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
