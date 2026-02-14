@@ -1,4 +1,4 @@
-import org.testng.annotations.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import praktikum.Bun;
@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
+// Использование Parameterized runner из JUnit
 @RunWith(Parameterized.class)
 public class BunTests {
 
@@ -14,7 +15,6 @@ public class BunTests {
     private float expectedPrice;
 
     // Конструктор теста, принимающий параметры булочки и ожидаемых значений
-
     public BunTests(Bun bun, String expectedName, float expectedPrice) {
         this.bun = bun;
         this.expectedName = expectedName;
@@ -22,7 +22,6 @@ public class BunTests {
     }
 
     // Данные для тестирования
-
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -33,10 +32,9 @@ public class BunTests {
     }
 
     // Основной тест, проверяющий правильность булочки
-
     @Test
     public void shouldCreateBunCorrectly() {
-        assertEquals(expectedName, bun.getName());                     // Проверка названия
-        assertEquals(expectedPrice, bun.getPrice(), 0.01f);      // Проверка цены с точностью до 0.01
+        assertEquals(expectedName, bun.getName());                      // Проверка названия
+        assertEquals(expectedPrice, bun.getPrice(), 0.01f);       // Проверка цены с точностью до 0.01
     }
 }

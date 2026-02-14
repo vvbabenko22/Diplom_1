@@ -46,5 +46,4 @@ public class IngredientTypeTests {
         IngredientType[] values = IngredientType.values();
         assertEquals(2, values.length); // Проверяем, что всего два элемента
     }
-
 }
